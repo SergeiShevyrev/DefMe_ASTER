@@ -87,8 +87,7 @@ except:
     print('can not open HDF file. Exiting...')
     exit();      
     
-    
-#написать программу DefME для ASTER    
+
     
 # replace <subdataset> with the number of the subdataset you need, starting with 0
 #band_ds = gdal.Open(hdf_ds.GetSubDatasets()[<subdataset>][0], gdal.GA_ReadOnly)
@@ -96,15 +95,7 @@ subdatasets_list=[band[1] for band in hdf_ds.GetSubDatasets()];
 
 out_dir_name='AST_L1T_'+foldname+'_Unpacked'
 
-"""
-#taking adjusctment resolution from 'ImageData1'
 
-for rec in subdatasets_list:
-    if 'ImageData1' in rec: #took resolution from first band, 15 m
-        h=int(re.sub('[^0-9]','',rec.split(' ')[0].split('x')[0]));
-        w=int(re.sub('[^0-9]','',rec.split(' ')[0].split('x')[1]));
-        break;
-"""
 if target_resolution==15:
     h,w=5023,5653;
 elif target_resolution==30:
@@ -183,15 +174,6 @@ for subds in hdf_ds.GetSubDatasets():
     
 
     #check radiometric range in band array, normalize to uint16 if uint8
-    """
-    if 'uint8' in str(type(band_array[0,0])):
-        b_a16=np.uint16((np.float64(band_array)/255)*(2**16));
-        band_array=b_a16.copy(); del b_a16;
-        
-        metadata['SUN_ELEVATION'];      
-        SunAzimuth=metadata['SUN_AZIMUTH']; 
-        
-    """
     
     # get the projection
     geoTrans = band_ds.GetGeoTransform()
@@ -237,15 +219,7 @@ for subds in hdf_ds.GetSubDatasets():
         HEIGHT=h;
         resx=-(ULX-URX)/WIDTH;
         resy=-(ULY-LLY)/HEIGHT;
-    
-    """
-    if w!=band_reflectance.shape[1] or h!=band_reflectance.shape[0]:
-        band_reflectance = resize(band_reflectance, (h, w), anti_aliasing=True,preserve_range=True)       
-        WIDTH=w;
-        HEIGHT=h;
-        resx=-(ULX-URX)/WIDTH;
-        resy=-(ULY-LLY)/HEIGHT;
-    """
+   
     
     #show image
     plt.imshow(band_reflectance)
@@ -258,12 +232,7 @@ for subds in hdf_ds.GetSubDatasets():
     
     if os.path.isdir(os.path.join('..',out_dir_name))==False:
         os.mkdir(os.path.join('..',out_dir_name));    
-    """
-    if ('8-bit' in subdatasets_list[count]) or ('16-bit' in subdatasets_list[count]):
-        dt=gdal.GDT_UInt16;
-    else:
-        dt=gdal.GDT_Float64;
-    """
+
     dt=gdal.GDT_Float64;
     
     dst_ds = driver.Create(out_file_name, WIDTH, HEIGHT, 1, dt)
